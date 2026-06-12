@@ -14,7 +14,7 @@ function Layout({ children }) {
     return (
         <>
             <Navbar />
-            <main style={{ padding: '24px' }}>
+            <main className="page">
                 {children}
             </main>
         </>

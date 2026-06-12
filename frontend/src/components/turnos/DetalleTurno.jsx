@@ -56,22 +56,17 @@ function DetalleTurno() {
 
     function puedeConfirmar() {
         if (turno?.estado !== 'solicitado') return false;
-        if (usuario?.rol === 'admin') return true;
-        if (usuario?.rol === 'tutor') return true;
-        return false;
+        return usuario?.rol === 'admin' || usuario?.rol === 'tutor';
     }
 
     function puedeRealizar() {
         if (turno?.estado !== 'confirmado') return false;
-        if (usuario?.rol === 'admin') return true;
-        if (usuario?.rol === 'tutor') return true;
-        return false;
+        return usuario?.rol === 'admin' || usuario?.rol === 'tutor';
     }
 
     function puedeCancelar() {
         if (!['solicitado', 'confirmado'].includes(turno?.estado)) return false;
-        if (usuario?.rol === 'admin') return true;
-        if (usuario?.rol === 'tutor') return true;
+        if (usuario?.rol === 'admin' || usuario?.rol === 'tutor') return true;
         if (usuario?.rol === 'estudiante' && turno?.estudianteId === usuario?.id) return true;
         return false;
     }
@@ -83,117 +78,100 @@ function DetalleTurno() {
         return false;
     }
 
-    function badgeColor(estado) {
-        const colores = { solicitado: '#d69e2e', confirmado: '#38a169', cancelado: '#e53e3e', realizado: '#3182ce' };
-        return colores[estado] || '#718096';
-    }
-
-    if (error && !turno) return <p style={{ color: '#e53e3e' }}>{error}</p>;
-    if (!turno) return <p>Cargando turno...</p>;
+    if (error && !turno) return <p className="alert alert--error">{error}</p>;
+    if (!turno) return <p className="empty-state">Cargando turno...</p>;
 
     return (
-        <div style={styles.container}>
-            <div style={styles.header}>
-                <button onClick={() => navigate('/turnos')} style={styles.botonVolver}>← Volver</button>
-                <h2>Detalle del turno #{turno.id}</h2>
+        <div>
+            <div className="detail-header">
+                <button onClick={() => navigate('/turnos')} className="btn btn--secondary btn--sm">
+                    ← Volver
+                </button>
+                <h2>TURNO #{String(turno.id).padStart(4, '0')}</h2>
             </div>
 
-            {mensaje && <p style={styles.exito}>{mensaje}</p>}
-            {error && <p style={styles.error}>{error}</p>}
+            {mensaje && <p className="alert alert--success">{mensaje}</p>}
+            {error && <p className="alert alert--error">{error}</p>}
 
             {/* Datos del turno */}
-            <div style={styles.card}>
-                <div style={styles.fila}>
-                    <span style={styles.label}>Estado</span>
-                    <span style={{ ...styles.badge, backgroundColor: badgeColor(turno.estado) }}>
-                        {turno.estado}
-                    </span>
+            <div className="panel">
+                <div className="detail-row">
+                    <span className="detail-row__label">Estado</span>
+                    <span className={`badge badge--${turno.estado}`}>{turno.estado}</span>
                 </div>
-                <div style={styles.fila}>
-                    <span style={styles.label}>Tutor</span>
-                    <span>{turno.Tutor?.nombre} — {turno.Tutor?.especialidad}</span>
+                <div className="detail-row">
+                    <span className="detail-row__label">Tutor</span>
+                    <span className="detail-row__value">{turno.Tutor?.nombre} — {turno.Tutor?.especialidad}</span>
                 </div>
-                <div style={styles.fila}>
-                    <span style={styles.label}>Estudiante</span>
-                    <span>{turno.estudiante?.nombre}</span>
+                <div className="detail-row">
+                    <span className="detail-row__label">Estudiante</span>
+                    <span className="detail-row__value">{turno.estudiante?.nombre}</span>
                 </div>
-                <div style={styles.fila}>
-                    <span style={styles.label}>Fecha</span>
-                    <span>{turno.fecha}</span>
+                <div className="detail-row">
+                    <span className="detail-row__label">Fecha</span>
+                    <span className="detail-row__value">{turno.fecha}</span>
                 </div>
-                <div style={styles.fila}>
-                    <span style={styles.label}>Horario</span>
-                    <span>{turno.horaInicio} - {turno.horaFin}</span>
+                <div className="detail-row">
+                    <span className="detail-row__label">Horario</span>
+                    <span className="detail-row__value">{turno.horaInicio} – {turno.horaFin}</span>
                 </div>
-                <div style={styles.fila}>
-                    <span style={styles.label}>Tema</span>
-                    <span>{turno.tema}</span>
+                <div className="detail-row">
+                    <span className="detail-row__label">Tema</span>
+                    <span className="detail-row__value">{turno.tema}</span>
                 </div>
-                <div style={styles.fila}>
-                    <span style={styles.label}>Modalidad</span>
-                    <span>{turno.modalidad}</span>
+                <div className="detail-row">
+                    <span className="detail-row__label">Modalidad</span>
+                    <span className="detail-row__value">{turno.modalidad}</span>
                 </div>
                 {turno.observaciones && (
-                    <div style={styles.fila}>
-                        <span style={styles.label}>Observaciones</span>
-                        <span>{turno.observaciones}</span>
+                    <div className="detail-row">
+                        <span className="detail-row__label">Observaciones</span>
+                        <span className="detail-row__value">{turno.observaciones}</span>
                     </div>
                 )}
             </div>
 
             {/* Acciones según rol y estado */}
-            <div style={styles.acciones}>
+            <div className="detail-actions">
                 {puedeEditar() && (
-                    <Link to={`/turnos/${turno.id}/editar`} style={styles.botonEditar}>
+                    <Link to={`/turnos/${turno.id}/editar`} className="btn btn--secondary">
                         Editar
                     </Link>
                 )}
                 {puedeConfirmar() && (
-                    <button
-                        onClick={() => handleAccion('confirmar')}
-                        disabled={cargando}
-                        style={styles.botonConfirmar}
-                    >
+                    <button onClick={() => handleAccion('confirmar')} disabled={cargando} className="btn btn--success">
                         {cargando ? 'Procesando...' : 'Confirmar'}
                     </button>
                 )}
                 {puedeRealizar() && (
-                    <button
-                        onClick={() => handleAccion('realizar')}
-                        disabled={cargando}
-                        style={styles.botonRealizar}
-                    >
-                        {cargando ? 'Procesando...' : 'Marcar como realizado'}
+                    <button onClick={() => handleAccion('realizar')} disabled={cargando} className="btn btn--info">
+                        {cargando ? 'Procesando...' : 'Marcar realizado'}
                     </button>
                 )}
                 {puedeCancelar() && (
-                    <button
-                        onClick={() => handleAccion('cancelar')}
-                        disabled={cargando}
-                        style={styles.botonCancelar}
-                    >
+                    <button onClick={() => handleAccion('cancelar')} disabled={cargando} className="btn btn--danger">
                         {cargando ? 'Procesando...' : 'Cancelar turno'}
                     </button>
                 )}
             </div>
 
             {/* Historial */}
-            <div style={styles.historialContainer}>
+            <div className="panel">
                 <h3>Historial de cambios</h3>
                 {historial === null ? (
-                    <p>Cargando historial...</p>
+                    <p className="empty-state">Cargando historial...</p>
                 ) : historial.length === 0 ? (
-                    <p style={{ color: '#718096' }}>Sin historial registrado.</p>
+                    <p className="empty-state">Sin historial registrado.</p>
                 ) : (
-                    <ul style={styles.historialLista}>
+                    <ul className="history">
                         {historial.map(h => (
-                            <li key={h.id} style={styles.historialItem}>
-                                <span style={styles.accionBadge}>{h.accion}</span>
-                                <span>{h.fechaHora?.replace('T', ' ').slice(0, 19)}</span>
-                                <span style={{ color: '#4a5568' }}>por {h.Usuario?.nombre}</span>
+                            <li key={h.id} className="history__item">
+                                <span className="history__tag">{h.accion}</span>
+                                <span className="history__date">{h.fechaHora?.replace('T', ' ').slice(0, 19)}</span>
+                                <span className="history__user">por {h.Usuario?.nombre}</span>
                                 {h.valorAnterior && (
-                                    <span style={{ color: '#718096', fontSize: '0.85rem' }}>
-                                        {JSON.parse(h.valorAnterior) && `antes: ${JSON.stringify(JSON.parse(h.valorAnterior))}`}
+                                    <span className="history__diff">
+                                        antes: {JSON.stringify(JSON.parse(h.valorAnterior))}
                                     </span>
                                 )}
                             </li>
@@ -204,26 +182,5 @@ function DetalleTurno() {
         </div>
     );
 }
-
-const styles = {
-    container: { maxWidth: '800px', margin: '0 auto' },
-    header: { display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' },
-    botonVolver: { padding: '6px 12px', backgroundColor: '#e2e8f0', border: 'none', borderRadius: '4px', cursor: 'pointer' },
-    card: { backgroundColor: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', marginBottom: '20px' },
-    fila: { display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f0f0f0' },
-    label: { fontWeight: 'bold', color: '#4a5568' },
-    badge: { padding: '2px 12px', borderRadius: '12px', color: 'white', fontSize: '0.9rem' },
-    acciones: { display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' },
-    botonEditar: { padding: '8px 16px', backgroundColor: '#3182ce', color: 'white', borderRadius: '4px', textDecoration: 'none' },
-    botonConfirmar: { padding: '8px 16px', backgroundColor: '#38a169', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' },
-    botonRealizar: { padding: '8px 16px', backgroundColor: '#3182ce', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' },
-    botonCancelar: { padding: '8px 16px', backgroundColor: '#e53e3e', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' },
-    exito: { color: '#38a169', backgroundColor: '#f0fff4', padding: '12px', borderRadius: '4px', marginBottom: '16px' },
-    error: { color: '#e53e3e', backgroundColor: '#fff5f5', padding: '12px', borderRadius: '4px', marginBottom: '16px' },
-    historialContainer: { backgroundColor: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' },
-    historialLista: { listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' },
-    historialItem: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap', padding: '8px', backgroundColor: '#f7fafc', borderRadius: '4px' },
-    accionBadge: { padding: '2px 8px', backgroundColor: '#2d3748', color: 'white', borderRadius: '4px', fontSize: '0.8rem' }
-};
 
 export default DetalleTurno;

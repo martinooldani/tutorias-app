@@ -42,6 +42,23 @@ npm install
 npm run dev      # inicia en http://localhost:5173
 ```
 
+
+## Variables de entorno
+
+Antes de ejecutar el backend, crear el archivo `backend/.env`:
+
+```env
+JWT_SECRET=clave_secreta_muy_larga_para_tutorias_dds_2026
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_SECRET=clave_refresh_diferente_tutorias_dds_2026
+JWT_REFRESH_EXPIRES_IN=7d
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+NODE_ENV=development
+```
+
+Este archivo no se incluye en el repositorio por seguridad.
+
 ---
 
 ## Usuarios de prueba
